@@ -1,0 +1,54 @@
+- hosts: all
+  become: true
+  become_method: sudo
+  gather_facts: False
+
+  vars:
+   - MyMessage: "Welcome to Ansible world!"
+   - domain: helloworld.com
+
+  tasks:
+   - name: Nginx setup
+     apt: pkg=nginx state=present update_cache=true
+
+   - name: delete default nginx site
+     file:
+      path: /etc/nginx/sites-enabled/assignment.conf
+      state: absent
+
+   - name: copy nginx.conf
+     template:
+       src: assignment.conf
+       dest: /etc/nginx/sites-available/
+       owner: root
+       group: root
+       mode: '0644'
+    
+   - name: "create www directory"
+     file:
+        path: /var/www/{{ domain }}
+        state: directory
+        mode: '0775'
+
+   - name: create symlink
+     file:
+        src: /etc/nginx/sites-available/assignment.conf
+        dest: /etc/nginx/sites-enabled/default
+        state: link
+     become: yes
+
+   - name: "sync website"
+     synchronize:
+        src: site/
+        dest: /var/www/{{ domain }}
+        archive: no
+        checksum: yes
+        recursive: yes
+        delete: yes
+     become: true
+
+   - name: restart nginx
+     service:
+        name: nginx
+        state: restarted
+...
