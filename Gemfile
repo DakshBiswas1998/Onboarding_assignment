@@ -1,0 +1,10 @@
+source 'http://rubygems.org'
+
+gem 'appium_lib'
+gem 'cucumber'
+gem 'rspec'
+gem 'rake'
+gem 'browserstack-local'
+gem 'parallel_tests'
+gem 'selenium-cucumber'
+gem 'selenium-webdriver'
